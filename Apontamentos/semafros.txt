@@ -1,0 +1,84 @@
+semafros
+Operações:
+
+	são disponibilizadas duas operações acquire e release;
+	estas operações são vistas como atómicas;
+	acquire: tenta decrementar o valor do semáforo, bloqueando o processo no semáforo caso o valor seja 0;
+	release: se houver processos bloqueados no semáforo, liberta um arbitrariamente; senão, incrementa o valor do semáforo.
+
+Um caso particular importante: semáforos binários.
+O Semáforo binário pode apenas tomar os valores 0 e 1.
+As operações são as mesmas excepto release(S), que tem um
+comportamento indefinido, caso o valor do semáforo seja 1:
+if S.v = 1:
+comportamento indefinido
+elif S.l = {}:
+S.v = 1
+else:
+q = S.l.pop()
+ready(q)
+Este semáforo é também chamado de mutex, pois é apropriado
+para obter exclusão mútua.
+
+
+Exclusão mútua com semáforos
+É trivial obter exclusão mútua com semáforos.
+Basta um semáforo binário, iniciado a 1.
+Cada processo que quer entrar numa secção crítica faz:
+acquire(S);
+//
+// seccao critica
+//
+release(S);
+No primeiro processo o acquire coloca o semáforo a 0 e retorna.
+Se outros processos fizerem acquire, este bloqueia os
+processsos no semáforo.
+Quando um processo faz release, um dos processos é
+desbloqueado; o valor do semáforo mantém-se a 0.
+O último processo a fazer release coloca o semáforo a 1.
+
+
+E quanto à ausência de starvation?
+Para 2 processos, p e q:
+um processo p em starvation estaria bloqueado no acquire;
+teriamos S.v = 0 e p ∈ S.l;
+como #SC = 1 − S.v = 1, então q estaria na secção crítica;
+com apenas p e q teriamos S.l = {p};
+o release de q libertaria p, que entraria na secção crítica;
+portanto, para 2 processos não há starvation.
+E para N processos?
+
+Para N > 2 processos, nomeadamente p, q e r.
+Poderiamos ter uma sequência de eventos como:
+p e q bloqueados e r na secção crítica;
+release de r liberta q;
+r bloqueia novamente no acquire;
+release de q liberta r;
+q bloqueia novamente no acquire;
+voltamos à situação inicial;
+Esta sequência poderia repetir-se indefenidamente.
+Conclusão: p poderia esperar indefinidamente.
+Para N > 2 processos pode haver starvation.
+Problema: não há garantia de qual dos processos bloqueados
+no semáforo é libertado.
+
+
+Garantir ausência de starvation pode ser complexo.
+Variantes de semáforos podem dar mais garantias.
+Semáforos fortes têm uma fila de processos bloqueados (em vez
+de um conjunto); estes são libertados por ordem de chegada.
+Tal permite, por exemplo, evitar starvation na solução simples
+para secções críticas com N processos.
+acquire(S), sendo p o processo actual que executa:
+if S.v > 0:
+S.v = S.v - 1
+else:
+S.l.append(p) // acrescenta no fim da fila
+suspend()
+release(S):
+if S.l = []:
+S.v = S.v + 1
+else:
+q = S.l.pop(0) // remove e devolve o primeiro da fila
+ready(q)
+

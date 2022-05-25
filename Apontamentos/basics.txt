@@ -1,0 +1,89 @@
+Um segmento de código que acede a recursos partilhados é uma secção crítica;
+
+Uma solução para o problema das secções críticas deve garantir:
+exclusão mútua se um processo está a executar uma secção crítica,mais nenhum o pode estar;
+
+ausência de deadlock se vários processos estão a tentar entrar numa secção crítica, um deles deve conseguir;
+
+ausência de starvation se um processo tenta entrar numa secção crítica, inevitavelmente vai entrar.
+
+
+Na resolução de problemas de controlo de concorrência é útil distinguir duas situações:
+
+exclusão mútua: quando vários processos concorrem no acesso a recursos partilhados: 
+	caso particular muito comum;
+	processo apenas é impedido de prosseguir temporariamente;
+	com apenas um processo, este corre sempre sem problemas;
+	vulgarmente papeis simétricos;
+
+ordem de execução: quando existem padrões de cooperação e dependência entre acções de processos:
+	um processo não pode prosseguir até acção de outro;
+	processos bloqueiam-se voluntariamente;
+	processos são libertados por outros;
+	exige normalmente mais do que um processo;
+	vulgarmente papeis diferentes (e.g., produtor e consumidor);
+
+
+Existem dois tipos de propriedades:
+
+Segurança: determinada propriedade (invariante de estado) é sempre verificada:
+	exemplo: não estão dois processos na secção crítica;
+	exemplo: um filósofo só pode estar a comer com dois garfos;
+	a correcção diz respeito a certos estados nunca serem atingíveis.
+
+Animação: determinada propriedade será inevitavelmente (mais
+tarde ou mais cedo) verificada:
+	se processo quer entrar na secção crítica, acabará por entrar;
+	se filósofo quer comer, acabará por comer;
+	animação diz respeito a certos estados serem atingidos.
+
+Casos particulares importantes de propriedades de animação:
+Ausência de deadlock:
+	nunca é atingido um estado do qual não haja saída (não possa serfeito progresso para um estado desejável);
+Ausência de livelock:
+	nunca é atingido um de vários possíveis estados dos quais não
+	haja saída (para um estado desejável).
+Ausência de starvation:
+	quando um dado processo tenta continuamente efectuar uma dada
+	acção, acaba por o conseguir;
+	exemplo: um processo só pode ser ultrapassado numa espera um
+	número limitado de vezes.
+
+
+deadlocks  : 
+threads a e b 
+a ja adquiriu lock 1 esta a espera do lock 2 
+e o thread b esta a espera do lock 2 e ja adquiriu 1 
+soluçao seria adquirir por ordem 
+
+Adquirir locks por ordem arbitrária pode causar deadlock.
+// cliente 1; realiza uma transferencia
+c1.lock();
+c2.lock();
+c1.levantamento(3000);
+c2.deposito(3000);
+c1.unlock();
+c2.unlock();
+
+// cliente 2; consulta as duas contas
+c2.lock();
+c1.lock();
+i = c1.saldo();
+j = c2.saldo();
+c2.unlock();
+c1.unlock();
+Podemos ter cada thread com um lock e à espera do outro.
+
+Dependências cíclicas de aquisição podem causar deadlock.
+Uma solução para evitar deadlocks é:
+impor uma ordem total sobre os locks envolvidos;
+adquirir os lock necessários por ordem, do menor para o maior;
+(ao libertar a ordem não é importante.)
+// cliente 1; realiza uma transferencia
+c1.lock();
+c2.lock();
+...
+// cliente 2; consulta as duas contas
+c1.lock();
+c2.lock();
+...

@@ -1,0 +1,52 @@
+
+
+
+bounded-buffer como monitor
+Tipo asbtracto de dados com controlo de concorrência.
+Exclusão mútua é garantida internamente pelo buffer.
+Buffer contém mutex implícito (não declarado).
+Cada operação adquire e liberta o mutex, implicitamente.
+
+Monitor é uma entidade passiva, que é usada por processos.
+Exclusão mútua é obtida trivialmente.
+Tal como em semáforos, pode haver starvation na entrada.
+Monitores são usados em linguagens modernas via objectos.
+Monitores servem de base a primitivas em bibliotecas de
+concorrência para linguagens procedimentais; e.g. pthreads.
+
+Para além de exclusão mútua podemos ter outros requisitos.
+Exemplo: consumidor não pode prosseguir se buffer vazio.
+Variáveis de condição permitem a um processo bloquear-se
+voluntariamente.
+Variáveis de condição são declaradas explicitamente.
+Por tradição, o nome deverá sugerir uma condição (predicado)
+que se verdadeira permite ao processo prosseguir; e.g.:
+condition notEmpty;
+condition notFull;
+Processos testam predicado sobre variáveis de estado do
+monitor e decidem se bloqueiam.
+As variáveis de condição não têm valor que se leia ou escreva; o
+termo “variável” vem do aspecto sintáctico da declaração.
+Também chamadas condition queues
+
+bounded-buffer como monitor
+O buffer trata da exclusão mútua e ordem-de-execução.
+O código do produtor e consumidor fica trivial.
+Sendo buffer um monitor do tipo Buffer atrás:
+
+
+Um outro fenómeno vai, no entanto, obrigar ao uso de ciclos de
+espera: os spurious wakeups.
+
+
+Semáforos 											Monitores
+acquire pode ou não bloquear 								wait bloqueia sempre
+release tem sempre um efeito 								signal perde-se se fila vazia
+release desbloqueia processo arbitrário						signal desbloqueia primeiro processo da fila
+processo desbloqueado pode continuar imediatamente				processo desbloqueado necessita readquirir lock
+
+
+
+
+
+
